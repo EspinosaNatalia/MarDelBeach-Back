@@ -21,7 +21,7 @@ namespace tesisv2_back.Controllers
         public async Task<IActionResult> RegisterUser([FromBody] Usuario usuario)
         {
             if (usuario == null || string.IsNullOrEmpty(usuario.UID))
-                return BadRequest("Usuario inválido.");
+                return BadRequest("Usuario inválido.");  // BadRequest (400)
 
             var existingUser = await _context.Usuario
                 .FirstOrDefaultAsync(u => u.UID == usuario.UID);
@@ -30,10 +30,13 @@ namespace tesisv2_back.Controllers
             {
                 _context.Usuario.Add(usuario);
                 await _context.SaveChangesAsync();
-                return Ok("Usuario registrado correctamente.");
+                Console.WriteLine($"Usuario registrado: {usuario.Email}");  // Log para ver en consola
+                return Ok("Usuario registrado correctamente.");  // OK (200)
             }
 
-            return Ok("El usuario ya está registrado.");
+            Console.WriteLine($"El usuario {usuario.Email} ya existe.");  // Log para ver en consola
+            return Ok("El usuario ya está registrado.");  // OK (200)
         }
+
     }
 }

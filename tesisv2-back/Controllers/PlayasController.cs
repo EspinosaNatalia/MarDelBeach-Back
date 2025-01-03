@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace tesisv2_back.Controllers
 {
-
     [Route("api/[controller]")]
     [ApiController]
     public class PlayasController : ControllerBase
@@ -52,6 +51,27 @@ namespace tesisv2_back.Controllers
 
             return Ok(response); // Devuelve los datos de la playa en formato JSON
         }
+        [HttpPost("filtrar")]
+        public IActionResult FiltrarPlayas([FromBody] Filtro filtros)
+        {
+            var query = _context.Playa.AsQueryable();
+
+            // Verifica si se ha pasado una zona para filtrar
+            if (!string.IsNullOrEmpty(filtros.Zona))
+            {
+                query = query.Where(p => p.Zona == filtros.Zona); // Filtra las playas por zona
+            }
+
+            // Filtra por capacidad si está marcado como true
+            if (filtros.Capacidad)
+            {
+                query = query.Where(p => p.Capacidad >= 100 && p.Capacidad <= 500);
+            }
+
+            var playasFiltradas = query.ToList();
+            return Ok(playasFiltradas); // Devuelve las playas filtradas
+        }
+
 
         // POST: api/Playas
         [HttpPost]

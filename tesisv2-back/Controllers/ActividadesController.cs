@@ -36,6 +36,34 @@ namespace tesisv2_back.Controllers
             return Ok(actividad);
         }
 
+        // POST: api/Actividades/filtrar
+        [HttpPost("filtrar")]
+        public async Task<IActionResult> FiltrarActividades([FromBody] Filtro filtros)
+        {
+            var query = _context.Actividad.AsQueryable();
+
+            // Aplicar filtros
+            if (filtros.Teatros)
+            {
+                query = query.Where(a => a.Caracteristicas.Contains("Teatro")); // Filtro por teatros
+            }
+
+            if (filtros.Plazas)
+            {
+                query = query.Where(a => a.Caracteristicas.Contains("Plaza")); // Filtro por plazas
+            }
+
+            if (filtros.Restaurantes)
+            {
+                query = query.Where(a => a.Caracteristicas.Contains("Restaurante")); // Filtro por restaurantes
+            }
+
+     
+
+            var actividadesFiltradas = await query.ToListAsync(); // Ejecuta la consulta con los filtros aplicados
+            return Ok(actividadesFiltradas); // Devuelve las actividades filtradas
+        }
+
         // POST: api/Actividades
         [HttpPost]
         public async Task<IActionResult> CreateActividad([FromBody] Actividad nuevaActividad)
