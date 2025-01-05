@@ -16,5 +16,7 @@ namespace tesisv2_back.Models
 
         [Precision(5, 1)] // Define precisión y escala
         public decimal PromedioValoracion { get; set; }
+
+        public ICollection<Valoracion> Valoraciones { get; set; }  // Relación de una actividad con muchas valoraciones
     }
 }

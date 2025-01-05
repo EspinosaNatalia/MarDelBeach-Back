@@ -6,59 +6,69 @@ namespace tesisv2_back.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
+       
+            public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+                : base(options)
+            {
+            }
 
-        // Declaración de tablas (DbSets)
-        public DbSet<Playa> Playa { get; set; } = null!;
-        public DbSet<Actividad> Actividad { get; set; } = null!;
-        public DbSet<Usuario> Usuario { get; set; } = null!;
+            // Declaración de tablas (DbSets)
+            public DbSet<Playa> Playa { get; set; } = null!;
+            public DbSet<Actividad> Actividad { get; set; } = null!;
+            public DbSet<Usuario> Usuario { get; set; } = null!;
+            public DbSet<Valoracion> Valoraciones { get; set; }
 
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                base.OnModelCreating(modelBuilder);
 
+                // Configuración de las relaciones
+                modelBuilder.Entity<Valoracion>()
+                    .HasOne(v => v.Playa)
+                    .WithMany(p => p.Valoraciones)
+                    .HasForeignKey(v => v.PlayaId)
+                    .OnDelete(DeleteBehavior.Cascade); // Relación con Playa
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+                modelBuilder.Entity<Valoracion>()
+                    .HasOne(v => v.Actividad)
+                    .WithMany(a => a.Valoraciones)
+                    .HasForeignKey(v => v.ActividadId)
+                    .OnDelete(DeleteBehavior.Cascade); // Relación con Actividad
 
-            // Configurar nombres en minúscula y singular
-            modelBuilder.Entity<Playa>().ToTable("playa");
-            modelBuilder.Entity<Actividad>().ToTable("actividad");
-            modelBuilder.Entity<Usuario>().ToTable("usuario");
+                modelBuilder.Entity<Playa>().ToTable("playa");
+                modelBuilder.Entity<Actividad>().ToTable("actividad");
+                modelBuilder.Entity<Usuario>().ToTable("usuario");
 
+                // Datos iniciales (para ejemplo)
+                modelBuilder.Entity<Playa>().HasData(
+                    new Playa
+                    {
+                        Id = 1,
+                        Nombre = "Playa Grande",
+                        Direccion = "Avenida Costanera 123",
+                        Capacidad = 500,
+                        Zona = "Constitución",
+                        Imagenes = "assets/img/carr1.jpg,assets/img/carr2.jpg,assets/img/carr3.jpg",
+                        Caracteristicas = "Arena fina,Olas suaves,Ideal para familias",
+                        Servicios = "Restaurantes cercanos,Alquiler de sombrillas",
+                        Accesos = "Accesible en auto,Transporte público cercano",
+                        PromedioValoracion = 4.2m
+                    },
+                    new Playa
+                    {
+                        Id = 2,
+                        Nombre = "Punta Mogotes",
+                        Direccion = "Avenida Central 456",
+                        Capacidad = 600,
+                        Zona = "Zona Norte",
+                        Imagenes = "assets/img/login.jpg,assets/img/recomendaciones.jpeg,assets/img/mar.jpg",
+                        Caracteristicas = "Agua limpia,Olas tranquilas,Arena blanca",
+                        Servicios = "Parking cercano,Restaurantes,Alquiler de sombrillas",
+                        Accesos = "Transporte público cercano,Accesible para discapacitados",
+                        PromedioValoracion = 3.8m
+                    }
+                );
 
-            // Configuración inicial de datos para la tabla "playa"
-            modelBuilder.Entity<Playa>().HasData(
-                new Playa
-                {
-                    Id = 1,
-                    Nombre = "Playa Grande",
-                    Direccion = "Avenida Costanera 123",
-                    Capacidad = 500,
-                    Zona = "Constitución",
-                    Imagenes = "assets/img/carr1.jpg,assets/img/carr2.jpg,assets/img/carr3.jpg",
-                    Caracteristicas = "Arena fina,Olas suaves,Ideal para familias",
-                    Servicios = "Restaurantes cercanos,Alquiler de sombrillas",
-                    Accesos = "Accesible en auto,Transporte público cercano",
-                    PromedioValoracion = 4.2m
-                },
-                new Playa
-                {
-                    Id = 2,
-                    Nombre = "Punta Mogotes",
-                    Direccion = "Avenida Central 456",
-                    Capacidad = 600,
-                    Zona = "Zona Norte",
-                    Imagenes = "assets/img/login.jpg,assets/img/recomendaciones.jpeg,assets/img/mar.jpg",
-                    Caracteristicas = "Agua limpia,Olas tranquilas,Arena blanca",
-                    Servicios = "Parking cercano,Restaurantes,Alquiler de sombrillas",
-                    Accesos = "Transporte público cercano,Accesible para discapacitados",
-                    PromedioValoracion = 3.8m
-                }
-            );
-
-            // Configuración inicial de datos para la tabla "actividad"
             modelBuilder.Entity<Actividad>().HasData(
                 new Actividad
                 {
@@ -75,7 +85,6 @@ namespace tesisv2_back.Data
                 }
             );
 
-            // Configuración inicial de datos para la tabla "usuario"
             modelBuilder.Entity<Usuario>().HasData(
                 new Usuario
                 {

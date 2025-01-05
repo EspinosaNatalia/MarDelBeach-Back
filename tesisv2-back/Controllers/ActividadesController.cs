@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using tesisv2_back.Data;
 using tesisv2_back.Models;
 
+
 namespace tesisv2_back.Controllers
 {
     [ApiController]
@@ -58,7 +59,7 @@ namespace tesisv2_back.Controllers
                 query = query.Where(a => a.Caracteristicas.Contains("Restaurante")); // Filtro por restaurantes
             }
 
-     
+
 
             var actividadesFiltradas = await query.ToListAsync(); // Ejecuta la consulta con los filtros aplicados
             return Ok(actividadesFiltradas); // Devuelve las actividades filtradas
@@ -121,5 +122,57 @@ namespace tesisv2_back.Controllers
             await _context.SaveChangesAsync(); // Cambiado a async
             return NoContent();
         }
+
+      
+        
+        [HttpPost("valorar")]
+        public IActionResult AgregarValoracion([FromBody] Valoracion nuevaValoracion)
+        {
+            if (ModelState.IsValid)
+            {
+                // Agregar la nueva valoración
+                _context.Valoraciones.Add(nuevaValoracion);
+                _context.SaveChanges();
+
+                // Si la valoración está relacionada con una Actividad
+                if (nuevaValoracion.ActividadId.HasValue &&  nuevaValoracion.Playa != null)
+                {
+                    var actividad = _context.Actividad.Find(nuevaValoracion.ActividadId);
+                    if (actividad != null)
+                    {
+                        // Calcular el promedio de valoraciones para la Actividad
+                        var promedio = (decimal)_context.Valoraciones
+                          .Where(v => v.ActividadId == nuevaValoracion.ActividadId)
+                          .Average(v => v.Estrellas);  // También aquí la conversión explícita
+
+                        actividad.PromedioValoracion = promedio;
+                        _context.SaveChanges();
+                    }
+                }
+
+                return Ok("Valoración agregada correctamente");
+            }
+            return BadRequest("Datos inválidos");
+        }
+
+
+
+        [HttpDelete("valoracion/{id}")]
+        public IActionResult EliminarValoracion(int id, [FromQuery] string usuario)
+        {
+            var valoracion = _context.Valoraciones.FirstOrDefault(v => v.Id == id && v.Usuario == usuario);
+            if (valoracion == null)
+            {
+                return NotFound("Valoración no encontrada o no es tuya");
+            }
+
+            _context.Valoraciones.Remove(valoracion);
+            _context.SaveChanges();
+
+            return Ok("Valoración eliminada correctamente");
+        }
+
+
+
     }
 }
