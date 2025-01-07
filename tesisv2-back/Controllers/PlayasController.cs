@@ -129,20 +129,21 @@ namespace tesisv2_back.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Agregar la nueva valoración
-                _context.Valoraciones.Add(nuevaValoracion);
-                _context.SaveChanges();
-
                 // Si la valoración está relacionada con una Playa
                 if (nuevaValoracion.PlayaId.HasValue)
                 {
                     var playa = _context.Playa.Find(nuevaValoracion.PlayaId);
                     if (playa != null)
                     {
+                        // Agregar la valoración
+                        _context.Valoraciones.Add(nuevaValoracion);
+                        _context.SaveChanges();
+
                         // Calcular el promedio de valoraciones para la Playa
                         var promedio = (decimal)_context.Valoraciones
-                 .Where(v => v.PlayaId == nuevaValoracion.PlayaId)
-                 .Average(v => v.Estrellas);  // Aquí es donde se hace la conversión explícita
+                            .Where(v => v.PlayaId == nuevaValoracion.PlayaId)
+                            .Average(v => v.Estrellas);
+
                         playa.PromedioValoracion = promedio;
                         _context.SaveChanges();
                     }
@@ -152,8 +153,6 @@ namespace tesisv2_back.Controllers
             }
             return BadRequest("Datos inválidos");
         }
-
-
 
 
 

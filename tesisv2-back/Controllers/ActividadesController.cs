@@ -123,27 +123,27 @@ namespace tesisv2_back.Controllers
             return NoContent();
         }
 
-      
-        
+
+
         [HttpPost("valorar")]
         public IActionResult AgregarValoracion([FromBody] Valoracion nuevaValoracion)
         {
             if (ModelState.IsValid)
             {
-                // Agregar la nueva valoración
-                _context.Valoraciones.Add(nuevaValoracion);
-                _context.SaveChanges();
-
                 // Si la valoración está relacionada con una Actividad
-                if (nuevaValoracion.ActividadId.HasValue &&  nuevaValoracion.Playa != null)
+                if (nuevaValoracion.ActividadId.HasValue)
                 {
                     var actividad = _context.Actividad.Find(nuevaValoracion.ActividadId);
                     if (actividad != null)
                     {
+                        // Agregar la valoración
+                        _context.Valoraciones.Add(nuevaValoracion);
+                        _context.SaveChanges();
+
                         // Calcular el promedio de valoraciones para la Actividad
                         var promedio = (decimal)_context.Valoraciones
-                          .Where(v => v.ActividadId == nuevaValoracion.ActividadId)
-                          .Average(v => v.Estrellas);  // También aquí la conversión explícita
+                            .Where(v => v.ActividadId == nuevaValoracion.ActividadId)
+                            .Average(v => v.Estrellas);
 
                         actividad.PromedioValoracion = promedio;
                         _context.SaveChanges();
@@ -154,6 +154,8 @@ namespace tesisv2_back.Controllers
             }
             return BadRequest("Datos inválidos");
         }
+
+
 
 
 

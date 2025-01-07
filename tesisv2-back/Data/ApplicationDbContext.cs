@@ -82,7 +82,21 @@ namespace tesisv2_back.Data
                     Servicios = "Vestuario,Duchas,Alquiler de equipos",
                     Accesos = "Acceso por la playa,Transporte público cercano",
                     PromedioValoracion = 4.8m
-                }
+                },
+                 new Actividad
+                 {
+                     Id = 2,
+                     Nombre = "Teatro Radio City",
+                     Descripcion = "Teatro Radio City, con 3 salas.",
+                     Imagen = "assets/img/radiocity.jpg,assets/img/radio2.jpg,assets/img/radio3.jpg",
+                     Direccion = "San Luis 2544",
+                     Zona = "Centro",
+                     Caracteristicas = "3 increíbles salas: Radio City, Melany y Roxy",
+                     Servicios = "Comedor, boletería",
+                     Accesos = "Por calle San Luis",
+                     PromedioValoracion = 2.5m
+                 }
+
             );
 
             modelBuilder.Entity<Usuario>().HasData(
